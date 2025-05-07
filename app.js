@@ -1,8 +1,10 @@
 const { default: axios } = require('axios')
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const PORT = 4000
 
+app.use(cors())
 
 app.get('/characters', async (req, res) => {
 	const url = 'https://rickandmortyapi.com/api/character'
