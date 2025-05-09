@@ -10,7 +10,7 @@ app.get('/characters', async (req, res) => {
 	const url = 'https://rickandmortyapi.com/api/character'
 	try {
 		const response = await axios.get(url)
-		const characters = response.data
+		const characters = response.data.results
 		res.json(characters)
 
   } catch (error) {
@@ -19,27 +19,28 @@ app.get('/characters', async (req, res) => {
 })
 
 app.get('/characters/:name', async (req, res) => {
-	const personaje = req.params.name
-	const urlName = `https://rickandmortyapi.com/api/character/?name=${personaje}`
-
+	const characterName = req.params.name
 	try {
-		const response = await axios.get(urlName)
-		const data = response.data
+		const response = await axios.get(`https://rickandmortyapi.com/api/character/?name=${characterName}`)
+		const character = response.data.results
 
-		data.results.find(elemento => {
-			if (elemento.name === personaje) {
+		if (character) {
+			const filterCharacter = character.map(elemento => {	// En este caso map() es lo más idóneo por que hay un array para recorrer.
 
 				const infopersonaje = {
-					name: `${elemento.name}`,
-					status: `${elemento.status}`,
-					species: `${elemento.species}`,
-					gender: `${elemento.gender}`,
-					origin: `${elemento.origin.name}`,
-					imagen: `${elemento.image}`
+					name: elemento.name,
+					status: elemento.status,
+					species: elemento.species,
+					gender: elemento.gender,
+					origin: elemento.origin.name,
+					image: elemento.image
 				}
-				return res.json(infopersonaje)
-			}	
-		});
+				return infopersonaje
+			})
+			res.json(filterCharacter)	
+		} else {
+			res.status(404).json({mensaje: 'Personaje no encontrado'})
+		}
 	} catch (error) {
 		res.status(404).json(`No se ha podido encontrar a ${personaje}`)
 	}
